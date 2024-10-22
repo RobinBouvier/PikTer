@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "15104461301",
+    "firebase_url": "https://pikterrbpv-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "pikterrbpv",
+    "storage_bucket": "pikterrbpv.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15104461301:android:a517dd03eb0f36076c78bc",
+        "android_client_info": {
+          "package_name": "com.example.pikter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAssn9QLwa3vI0WaHNNfztu73jYMEbQUnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
