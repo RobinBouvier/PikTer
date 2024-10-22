@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -19,8 +20,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
@@ -35,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     // Classe Post
     public static class Post {
         public String message;
-        public CharSequence date;
+        public String date;
         public String user;
         public int likes;
 
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             // Constructeur par défaut requis pour Firebase
         }
 
-        public Post(String message, CharSequence date, String user, int likes) {
+        public Post(String message, String date, String user, int likes) {
             this.message = message;
             this.date = date;
             this.user = user;
@@ -77,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 dialogPost.show();
             }
         });
+        fetchPostDatabase();
     }
 
     //gère ce que fais le like
@@ -98,7 +103,9 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Poster", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which){
-                        addPost(message.getText().toString());
+                        addPostDatabase(message.getText().toString());
+                        dialogPost.dismiss();
+                        buildDialog();
                     }
                 })
                 //on crée un bouton qui sert de negative (on annule ce qu'on fait)
@@ -112,28 +119,16 @@ public class MainActivity extends AppCompatActivity {
         dialogPost = builder.create(); //on met ce builder dans la view dialogPost
     }
 
+    /**
     //permet d'ajouter un post à postsLayout
     private void addPost(String message){
-        Date d = new Date(); //on récupère la date
-        CharSequence date  = DateFormat.format("d MMMM, yyyy ", d.getTime()); //on la formate
-
-        final View view = getLayoutInflater().inflate(R.layout.post, null); //on spécifie le fichier xml qui sert de view
-
-        //on met la date dans le champ dateBody
-        TextView dateView = view.findViewById(R.id.dateBody);
-        dateView.setText(date);
-
-        //on met le message de l'utilisateur dans messageBody
-        TextView userView = view.findViewById(R.id.messageBody);
-        userView.setText(message);
-
-        postLayout.addView(view);// on ajoute la view à postLayout
-        addPostDatabase(message);
+        //postLayout.addView(view);// on ajoute la view à postLayout
+        addPostDatabase(message);//on appelle la fonction pour ajouter le message à la BD
 
         //on supprime et recrée un dialogPost pour n'avoir aucun texte d'écrit par défaut dans le champ message
         dialogPost.dismiss();
         buildDialog();
-    }
+    }**/
 
     private void addPostDatabase(String message){
         //on récupère l'instance de la database
@@ -146,20 +141,67 @@ public class MainActivity extends AppCompatActivity {
         String postId = myRef.push().getKey();
 
         Date d = new Date(); //on récupère la date
-        CharSequence date  = DateFormat.format("d MMMM, yyyy ", d.getTime()); //on la formate
+        CharSequence dateChar  = DateFormat.format("d MMMM, yyyy ", d.getTime()); //on la formate
+        String date = dateChar.toString();
 
         //on crée le post
-        Post post = new Post("Hello World", date, "Alice", 10);
+        Post post = new Post(message, date, "Alice", 10);
 
         //on l'ajoute à la base de donnée
-        myRef.child(postId).setValue(post)
-                .addOnSuccessListener(aVoid -> {
-                    // Données ajoutées avec succès
-                    Log.d("Firebase", "Post ajouté !");
-                })
-                .addOnFailureListener(e -> {
-                    // Échec de l'ajout
-                    Log.e("Firebase", "Erreur lors de l'ajout du post", e);
-                });
+        myRef.child(postId).setValue(post);
+    }
+
+    //récupère les posts dans la base de données
+    private void fetchPostDatabase() {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("posts");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Cette méthode est appelée lorsque les données changent
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    // Déclaration des variables
+                    String message;
+                    String date;
+                    String user;
+                    int likes;
+
+                    Post post = postSnapshot.getValue(Post.class);
+                    message = post.message;
+                    date = post.date;
+                    user = post.user;
+                    likes = post.likes;
+
+                    final View view = getLayoutInflater().inflate(R.layout.post, null); //on spécifie le fichier xml qui sert de view
+
+                    //on met la date dans le champ dateBody
+                    TextView dateView = view.findViewById(R.id.dateBody);
+                    dateView.setText(date);
+
+                    //on met la user dans le champ userBody
+                    TextView userView = view.findViewById(R.id.userBody);
+                    userView.setText(user);
+
+                    //on met le message de l'utilisateur dans messageBody
+                    TextView messageView = view.findViewById(R.id.messageBody);
+                    messageView.setText(message);
+
+
+                    /**
+                    //on met les likes dans nbrLike
+                    String likeString = String.valueOf(likes);
+                    TextView likeView = view.findViewById(R.id.nbrLike);
+                    likeView.setText(likes);
+                    **/
+                    postLayout.addView(view);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Erreur lors de la récupération des données", error.toException());
+            }
+        });
     }
 }
