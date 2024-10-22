@@ -9,7 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    private List<String> displayedMessages = new ArrayList<>(); // on crée une liste avec l'ensemble des messages déjà affiché
     AlertDialog dialogPost = null; //la fenêtre qui pop quand on appuie sur le bouton post
     Button post; //le bouton post en haut de la page
     LinearLayout postLayout; //ce layout est celui qui contient les posts
@@ -54,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
             this.likes = likes;
         }
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
         //on l'ajoute à la base de donnée
         myRef.child(postId).setValue(post);
     }
-
     //récupère les posts dans la base de données
     private void fetchPostDatabase() {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -161,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Cette méthode est appelée lorsque les données changent
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+
                     // Déclaration des variables
                     String message;
                     String date;
@@ -173,28 +177,26 @@ public class MainActivity extends AppCompatActivity {
                     user = post.user;
                     likes = post.likes;
 
-                    final View view = getLayoutInflater().inflate(R.layout.post, null); //on spécifie le fichier xml qui sert de view
 
-                    //on met la date dans le champ dateBody
-                    TextView dateView = view.findViewById(R.id.dateBody);
-                    dateView.setText(date);
+                    if (!displayedMessages.contains(message))
+                    { // on vérifie si il y a déjà le message dans la liste
+                        displayedMessages.add(message); // on ajoute le message à la liste pour ne pas le réaficher
 
-                    //on met la user dans le champ userBody
-                    TextView userView = view.findViewById(R.id.userBody);
-                    userView.setText(user);
+                        final View view = getLayoutInflater().inflate(R.layout.post, null); // Spécifie le fichier xml qui sert de view
 
-                    //on met le message de l'utilisateur dans messageBody
-                    TextView messageView = view.findViewById(R.id.messageBody);
-                    messageView.setText(message);
+                        // Mettre à jour les vues avec les données du post
+                        TextView dateView = view.findViewById(R.id.dateBody);
+                        dateView.setText(date);
 
+                        TextView userView = view.findViewById(R.id.userBody);
+                        userView.setText(user);
 
-                    /**
-                    //on met les likes dans nbrLike
-                    String likeString = String.valueOf(likes);
-                    TextView likeView = view.findViewById(R.id.nbrLike);
-                    likeView.setText(likes);
-                    **/
-                    postLayout.addView(view);
+                        TextView messageView = view.findViewById(R.id.messageBody);
+                        messageView.setText(message);
+
+                        // Ajouter la vue au layout
+                        postLayout.addView(view);
+                    }
                 }
             }
 
