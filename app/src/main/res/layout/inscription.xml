@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <!-- Titre de la page -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="S'inscrire"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp"
+        android:gravity="center" />
+
+    <!-- Champ pour le nom -->
+    <EditText
+        android:id="@+id/first_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Prénom"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp" />
+
+    <!-- Champ pour le prénom -->
+    <EditText
+        android:id="@+id/last_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp" />
+
+    <!-- Champ pour l'adresse e-mail -->
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp" />
+
+    <!-- Champ pour le mot de passe -->
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mot de passe"
+        android:inputType="textPassword"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp" />
+
+    <!-- Bouton d'inscription -->
+    <Button
+        android:id="@+id/signup_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="S'inscrire"
+        android:textColor="#FFFFFF"
+        android:padding="14dp"
+        android:textSize="16sp" />
+
+    <!-- Lien vers la page de connexion -->
+    <TextView
+        android:id="@+id/login_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Déjà un compte ? Se connecter"
+        android:textColor="#007BFF"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:onClick="onLoginClicked" />
+
+    <!-- Image sous le bouton -->
+    <ImageView
+        android:id="@+id/placeholder_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/pikterlogo"
+        android:contentDescription="Image de placeholder"
+        android:scaleType="centerCrop" />
+
+</LinearLayout>
