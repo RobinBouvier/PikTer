@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         public String date;
         public String user;
         public int likes;
+        public long timestamp;
+        public String key;
 
         public Post() {
             // Constructeur par défaut requis pour Firebase
@@ -54,9 +56,24 @@ public class MainActivity extends AppCompatActivity {
             this.date = date;
             this.user = user;
             this.likes = likes;
+            this.timestamp = System.currentTimeMillis(); // initialise à la date actuelle
+            this.key = null; // Initialise à null
+        }
+
+        public void ajoutLike() {
+            this.likes++;
+        }
+
+        public long getAgeInDays() {
+            long currentTime = System.currentTimeMillis();
+            return (currentTime - timestamp) / (1000 * 60 * 60 * 24); // convertit en jours
+        }
+
+        public double calculateScore() {
+            long age = getAgeInDays();
+            return (30 - age) * likes; // formule pour le score
         }
     }
-
 
 
     @Override
@@ -94,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //créer la bulle qui permet d'ajouter un message
-    public void buildDialog(){
+    public void buildDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);//on crée un builder de l'alert dialog qui va permettre de lui donner des paramètres
         View view = getLayoutInflater().inflate(R.layout.dialog_post, null);//permet de transformer un fichier XML en une view pour l'utiliser dans le code
@@ -104,18 +121,18 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(view); //spécifie la view qui sera montré dans l'alert dialog
         builder.setTitle("Écrivez votre post") //on met un titre
                 //on crée un bouton qui sert de positive (on valide ce qu'on fait)
-                .setPositiveButton("Poster", new DialogInterface.OnClickListener(){
+                .setPositiveButton("Poster", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which){
+                    public void onClick(DialogInterface dialog, int which) {
                         addPostDatabase(message.getText().toString());
                         dialogPost.dismiss();
                         buildDialog();
                     }
                 })
                 //on crée un bouton qui sert de negative (on annule ce qu'on fait)
-                .setNegativeButton("Annuler", new DialogInterface.OnClickListener(){
+                .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick (DialogInterface dialog,int which){
+                    public void onClick(DialogInterface dialog, int which) {
 
                     }
                 });
@@ -124,17 +141,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-    //permet d'ajouter un post à postsLayout
-    private void addPost(String message){
-        //postLayout.addView(view);// on ajoute la view à postLayout
-        addPostDatabase(message);//on appelle la fonction pour ajouter le message à la BD
+     * //permet d'ajouter un post à postsLayout
+     * private void addPost(String message){
+     * //postLayout.addView(view);// on ajoute la view à postLayout
+     * addPostDatabase(message);//on appelle la fonction pour ajouter le message à la BD
+     * <p>
+     * //on supprime et recrée un dialogPost pour n'avoir aucun texte d'écrit par défaut dans le champ message
+     * dialogPost.dismiss();
+     * buildDialog();
+     * }
+     **/
 
-        //on supprime et recrée un dialogPost pour n'avoir aucun texte d'écrit par défaut dans le champ message
-        dialogPost.dismiss();
-        buildDialog();
-    }**/
-
-    private void addPostDatabase(String message){
+    private void addPostDatabase(String message) {
         //on récupère l'instance de la database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -145,16 +163,24 @@ public class MainActivity extends AppCompatActivity {
         String postId = myRef.push().getKey();
 
         Date d = new Date(); //on récupère la date
-        CharSequence dateChar  = DateFormat.format("d MMMM, yyyy ", d.getTime()); //on la formate
+        CharSequence dateChar = DateFormat.format("d MMMM, yyyy ", d.getTime()); //on la formate
         String date = dateChar.toString();
 
         //on crée le post
-        Post post = new Post(message, date, "Alice", 10);
+        Post post = new Post(message, date, "Alice", 0);
 
         //on l'ajoute à la base de donnée
         myRef.child(postId).setValue(post);
     }
     //récupère les posts dans la base de données
+
+    private void updateLikesInDatabase(String postId, int likes) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("posts").child(postId);
+        myRef.child("likes").setValue(likes);
+    }
+
+
     private void fetchPostDatabase() {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("posts");
@@ -162,41 +188,23 @@ public class MainActivity extends AppCompatActivity {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Cette méthode est appelée lorsque les données changent
+                List<Post> posts = new ArrayList<>(); // Liste pour stocker les posts
+
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-
-                    // Déclaration des variables
-                    String message;
-                    String date;
-                    String user;
-                    int likes;
-
                     Post post = postSnapshot.getValue(Post.class);
-                    message = post.message;
-                    date = post.date;
-                    user = post.user;
-                    likes = post.likes;
-
-
-                    if (!displayedMessages.contains(message))
-                    { // on vérifie si il y a déjà le message dans la liste
-                        displayedMessages.add(message); // on ajoute le message à la liste pour ne pas le réaficher
-
-                        final View view = getLayoutInflater().inflate(R.layout.post, null); // Spécifie le fichier xml qui sert de view
-
-                        // Mettre à jour les vues avec les données du post
-                        TextView dateView = view.findViewById(R.id.dateBody);
-                        dateView.setText(date);
-
-                        TextView userView = view.findViewById(R.id.userBody);
-                        userView.setText(user);
-
-                        TextView messageView = view.findViewById(R.id.messageBody);
-                        messageView.setText(message);
-
-                        // Ajouter la vue au layout
-                        postLayout.addView(view);
+                    if (post != null) {
+                        post.key = postSnapshot.getKey(); // Stocker la clé du post
+                        posts.add(post); // Ajoute chaque post à la liste
                     }
+                }
+
+                // Trier les posts par score
+                posts.sort((p1, p2) -> Double.compare(p2.calculateScore(), p1.calculateScore()));
+
+                // Afficher les posts triés
+                postLayout.removeAllViews(); // Vider le layout avant d'ajouter les posts triés
+                for (Post post : posts) {
+                    displayPost(post); // Appeler displayPost sans passer la clé ici
                 }
             }
 
@@ -205,5 +213,36 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("Firebase", "Erreur lors de la récupération des données", error.toException());
             }
         });
+    }
+
+    // Méthode pour afficher un post
+    private void displayPost(Post post) {
+        final View view = getLayoutInflater().inflate(R.layout.post, null);
+
+        // Mettre à jour les vues avec les données du post
+        TextView dateView = view.findViewById(R.id.dateBody);
+        dateView.setText(post.date);
+
+        TextView userView = view.findViewById(R.id.userBody);
+        userView.setText(post.user);
+
+        TextView messageView = view.findViewById(R.id.messageBody);
+        messageView.setText(post.message);
+
+        Button likeButton = view.findViewById(R.id.likeButton);
+        TextView likesCountView = view.findViewById(R.id.nbrLike);
+        likesCountView.setText(post.likes + " Likes");
+
+        // Ajouter un écouteur au bouton Like
+        likeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                post.ajoutLike();
+                likesCountView.setText(post.likes + " Likes");
+                updateLikesInDatabase(post.key, post.likes); // Utiliser post.key ici
+            }
+        });
+
+        postLayout.addView(view); // Ajout de la vue au layout
     }
 }
