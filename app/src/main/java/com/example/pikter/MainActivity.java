@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         String date = dateChar.toString();
 
         //on crée le post
-        Post post = new Post(message, date, "Alice", 0);
+        Post post = new Post(message, date, LoginActivity.getUserConnecte(), 0);
 
         //on l'ajoute à la base de donnée
         myRef.child(postId).setValue(post);

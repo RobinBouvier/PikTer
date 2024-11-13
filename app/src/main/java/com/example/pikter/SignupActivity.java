@@ -37,6 +37,7 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inscription);
 
+        //transformer en view
         boutonInscription = (Button) findViewById(R.id.signup_button);
 
         final EditText prenom = findViewById(R.id.first_name);
@@ -68,7 +69,7 @@ public class SignupActivity extends AppCompatActivity {
         DatabaseReference myRef = database.getReference("user");
 
         //génère un id unique pour l'utilisateur
-        String userId = myRef.push().getKey();
+        String userId = email.getText().toString();
 
         //on crée l'utilisateur
         User user = new User(prenom.getText().toString(), nom.getText().toString(), email.getText().toString(), password.getText().toString());
@@ -77,7 +78,7 @@ public class SignupActivity extends AppCompatActivity {
         myRef.child(userId).setValue(user);
 
         // Créer un intent pour démarrer MainActivity
-        Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+        Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
         startActivity(intent); // Lancer l'activité
 
     }
