@@ -147,17 +147,7 @@ public class MainActivity extends AppCompatActivity {
         dialogPost = builder.create(); //on met ce builder dans la view dialogPost
     }
 
-    /**
-     * //permet d'ajouter un post à postsLayout
-     * private void addPost(String message){
-     * //postLayout.addView(view);// on ajoute la view à postLayout
-     * addPostDatabase(message);//on appelle la fonction pour ajouter le message à la BD
-     * <p>
-     * //on supprime et recrée un dialogPost pour n'avoir aucun texte d'écrit par défaut dans le champ message
-     * dialogPost.dismiss();
-     * buildDialog();
-     * }
-     **/
+
 
     private void addPostDatabase(String message) {
         //on récupère l'instance de la database
@@ -244,17 +234,25 @@ public class MainActivity extends AppCompatActivity {
         likesCountView.setText(post.likes + " Likes");
 
         if (post.listeUserLike.contains(userId)) {
-            // Si l'utilisateur a déjà liké, le bouton de like doit être désactivé
-            likeButton.setEnabled(false); // Empêche un deuxième like
+            likeButton.setText(""); // Change le texte du bouton
+        } else {
+            likeButton.setText(""); // Affiche "Aimer" si l'utilisateur n'a pas encore liké
         }
         // Ajouter un écouteur au bouton Like
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                post.ajoutLike(userId);
+                if (post.listeUserLike.contains(userId)) {
+                    // Si l'utilisateur a déjà liké, on enlève le like
+                    post.listeUserLike.remove(userId);
+                    post.likes--; // Décrémenter les likes
+                } else {
+                    // Si l'utilisateur n'a pas encore liké, on ajoute le like
+                    post.listeUserLike.add(userId);
+                    post.likes++; // Incrémenter les likes
+                }
                 likesCountView.setText(post.likes + " Likes");
                 updateLikesInDatabase(post.key, post.likes, post.listeUserLike); // Utiliser post.key ici
-                likeButton.setEnabled(false);
             }
         });
 
