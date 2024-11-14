@@ -66,30 +66,35 @@ public class LoginActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Vérifie si l'utilisateur existe dans la base de données
                 if (dataSnapshot.exists()) {
+                    // Récupère le mot de passe stocké dans la base de données
+                    String storedPassword = dataSnapshot.child("password").getValue(String.class);
 
-                    // Si l'utilisateur existe, on affiche un message dans les logs avec l'email de l'utilisateur
-                    Log.d("Firebase", "L'utilisateur avec ID " + email + " existe.");
+                    // Compare le mot de passe saisi avec celui stocké dans la base de données
+                    if (storedPassword != null && storedPassword.equals(password.getText().toString())) {
 
-                    // Crée un Intent pour démarrer l'activité MainActivity
-                    // l'utilisateur est connecté avec succès et est redirigé vers la page d'accueil
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);  // Lance l'activité Main
+                        // Si le mot de passe est correct
+                        Log.d("Firebase", "L'utilisateur avec ID " + email.getText().toString() + " est connecté.");
 
-                    // Appelle la méthode setUserConnecte pour sauvegarder l'email de l'utilisateur connecté
-                    setUserConnecte(email.getText().toString());
+                        // Crée un Intent pour démarrer l'activité MainActivity
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);  // Lance l'activité Main
 
+                        // Sauvegarde l'email de l'utilisateur connecté
+                        setUserConnecte(email.getText().toString());
+
+                    } else {
+                        // Si le mot de passe ne correspond pas
+                        Log.d("Firebase", "Mot de passe incorrect pour l'utilisateur " + email.getText().toString());
+                    }
                 } else {
-                    // Si l'utilisateur n'existe pas dans la base de données, on affiche un message dans les logs
-                    // avec l'email pour indiquer qu'il n'est pas trouvé.
-                    Log.d("Firebase", "L'utilisateur avec ID " + email + " n'existe pas.");
+                    // Si l'utilisateur n'existe pas dans la base de données
+                    Log.d("Firebase", "L'utilisateur avec ID " + email.getText().toString() + " n'existe pas.");
                 }
             }
 
-            // Cette méthode est appelée si la lecture de la base de données est annulée pour une raison quelconque
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // En cas d'erreur, affiche un message de log pour indiquer qu'il y a eu un problème avec la lecture des données
-                Log.w("Firebase", "Erreur de lecture : ");
+
             }
         });
     }
