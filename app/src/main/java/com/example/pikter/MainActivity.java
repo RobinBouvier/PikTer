@@ -46,9 +46,11 @@ public class MainActivity extends AppCompatActivity {
         public int likes;
         public long timestamp;
         public String key;
+        public List<String> listeUserLike;
 
         public Post() {
             // Constructeur par défaut requis pour Firebase
+            this.listeUserLike = new ArrayList<>(); // Initialise la liste vide si non initialisée
         }
 
         public Post(String message, String date, String user, int likes) {
@@ -58,10 +60,15 @@ public class MainActivity extends AppCompatActivity {
             this.likes = likes;
             this.timestamp = System.currentTimeMillis(); // initialise à la date actuelle
             this.key = null; // Initialise à null
+            this.listeUserLike = new ArrayList<>();
         }
 
-        public void ajoutLike() {
-            this.likes++;
+        public void ajoutLike(String userId) {
+            if (!listeUserLike.contains(userId)) {
+                // Si l'utilisateur n'est pas dans la liste, on l'ajoute
+                listeUserLike.add(userId);
+                this.likes++; // On incrémente les likes
+            }
         }
 
         public long getAgeInDays() {
@@ -174,10 +181,11 @@ public class MainActivity extends AppCompatActivity {
     }
     //récupère les posts dans la base de données
 
-    private void updateLikesInDatabase(String postId, int likes) {
+    private void updateLikesInDatabase(String postId, int likes, List<String> listeUserLike) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("posts").child(postId);
         myRef.child("likes").setValue(likes);
+        myRef.child("listeUserLike").setValue(listeUserLike);
     }
 
 
@@ -194,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                     Post post = postSnapshot.getValue(Post.class);
                     if (post != null) {
                         post.key = postSnapshot.getKey(); // Stocker la clé du post
-                        posts.add(post); // Ajoute chaque post à la liste
+                        posts.add(post); // Ajouter chaque post à la liste
                     }
                 }
 
@@ -219,6 +227,8 @@ public class MainActivity extends AppCompatActivity {
     private void displayPost(Post post) {
         final View view = getLayoutInflater().inflate(R.layout.post, null);
 
+        String userId = LoginActivity.getUserConnecte();
+
         // Mettre à jour les vues avec les données du post
         TextView dateView = view.findViewById(R.id.dateBody);
         dateView.setText(post.date);
@@ -233,13 +243,18 @@ public class MainActivity extends AppCompatActivity {
         TextView likesCountView = view.findViewById(R.id.nbrLike);
         likesCountView.setText(post.likes + " Likes");
 
+        if (post.listeUserLike.contains(userId)) {
+            // Si l'utilisateur a déjà liké, le bouton de like doit être désactivé
+            likeButton.setEnabled(false); // Empêche un deuxième like
+        }
         // Ajouter un écouteur au bouton Like
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                post.ajoutLike();
+                post.ajoutLike(userId);
                 likesCountView.setText(post.likes + " Likes");
-                updateLikesInDatabase(post.key, post.likes); // Utiliser post.key ici
+                updateLikesInDatabase(post.key, post.likes, post.listeUserLike); // Utiliser post.key ici
+                likeButton.setEnabled(false);
             }
         });
 
