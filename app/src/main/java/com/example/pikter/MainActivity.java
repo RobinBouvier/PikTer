@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,10 +114,6 @@ public class MainActivity extends AppCompatActivity {
         fetchPostDatabase();
     }
 
-    //gère ce que fais le like
-    public void onLikeToggleClick(View view) {
-
-    }
 
     //créer la bulle qui permet d'ajouter un message
     public void buildDialog() {
@@ -196,6 +194,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
+
+                // Compte les posts
+                int numberOfPosts = posts.size();
+
+                //afficher le compteur
+                TextView decoTextView = findViewById(R.id.nbrMessages);
+                decoTextView.setText("Posts : " + numberOfPosts + "   ");
+
                 // Trier les posts par score
                 posts.sort((p1, p2) -> Double.compare(p2.calculateScore(), p1.calculateScore()));
 
@@ -212,6 +218,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+private void nbrPost(Post post) {
+
+}
+
 
     // Méthode pour afficher un post
     private void displayPost(Post post) {
@@ -229,16 +239,17 @@ public class MainActivity extends AppCompatActivity {
         TextView messageView = view.findViewById(R.id.messageBody);
         messageView.setText(post.message);
 
-        Button likeButton = view.findViewById(R.id.likeButton);
+        ToggleButton likeButton = view.findViewById(R.id.likeButton);
         TextView likesCountView = view.findViewById(R.id.nbrLike);
         likesCountView.setText(post.likes + " Likes");
-
-        if (post.listeUserLike.contains(userId)) {
-            likeButton.setText(""); // Change le texte du bouton
-        } else {
-            likeButton.setText(""); // Affiche "Aimer" si l'utilisateur n'a pas encore liké
+        if(post.listeUserLike.contains(userId)) {
+            likeButton.setChecked(true);
         }
-        // Ajouter un écouteur au bouton Like
+        else {
+            likeButton.setChecked(false);
+        }
+
+        //gère ce que fais le like
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -246,10 +257,14 @@ public class MainActivity extends AppCompatActivity {
                     // Si l'utilisateur a déjà liké, on enlève le like
                     post.listeUserLike.remove(userId);
                     post.likes--; // Décrémenter les likes
+                    ((ToggleButton)v).setChecked(false);
+
                 } else {
                     // Si l'utilisateur n'a pas encore liké, on ajoute le like
                     post.listeUserLike.add(userId);
                     post.likes++; // Incrémenter les likes
+                    ((ToggleButton)v).setChecked(true);
+
                 }
                 likesCountView.setText(post.likes + " Likes");
                 updateLikesInDatabase(post.key, post.likes, post.listeUserLike); // Utiliser post.key ici
