@@ -23,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     public static String userConnecte;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference usersRef = database.getReference("user");
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -42,11 +43,11 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void setUserConnecte(String userConnecteParam){
+    private void setUserConnecte(String userConnecteParam) {
         userConnecte = userConnecteParam;
     }
 
-    public static String getUserConnecte(){
+    public static String getUserConnecte() {
         return userConnecte;
     }
 
@@ -98,11 +99,4 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
 }
-
-
-
-
-
-
