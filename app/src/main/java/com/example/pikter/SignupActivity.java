@@ -18,8 +18,8 @@ import java.util.Date;
 
 public class SignupActivity extends AppCompatActivity {
 
-    Button boutonInscription;
-    public static class User {
+    Button boutonInscription; //on déclare le bouton pour l'inscription
+    public static class User { //on définit nos variables utiles
         public String prenom;
         public String nom;
         public String email;
@@ -35,11 +35,11 @@ public class SignupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.inscription);
+        setContentView(R.layout.inscription); //on affiche notre layout inscription
 
         //transformer en view
         boutonInscription = (Button) findViewById(R.id.signup_button);
-
+        //on récupère les champs de saisie du XML
         final EditText prenom = findViewById(R.id.first_name);
         final EditText nom = findViewById(R.id.last_name);
         final EditText email = findViewById(R.id.email);
@@ -51,13 +51,14 @@ public class SignupActivity extends AppCompatActivity {
             public void onClick(View view) {
                 addUserDatabase(prenom, nom, email, password);
             }
+            //si le bouton est cliqué on ajoute l'utilisateur a la bdd
         });
     }
 
     public void onLoginClicked(View view) {
-        // Créer un intent pour démarrer LoginActivity
+        // créer un intent pour démarrer LoginActivity
         Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-        startActivity(intent); // Lancer l'activité
+        startActivity(intent); // Lancer l'activité login
     }
 
 
@@ -68,10 +69,10 @@ public class SignupActivity extends AppCompatActivity {
         //on récupère la base de données user
         DatabaseReference myRef = database.getReference("user");
 
-        //génère un id unique pour l'utilisateur
+        //on détermine l'id de l'utilisateur : son mail en string
         String userId = email.getText().toString();
 
-        //on crée l'utilisateur
+        //on crée l'utilisateur avec ses différents caractéristiques.
         User user = new User(prenom.getText().toString(), nom.getText().toString(), email.getText().toString(), password.getText().toString());
 
         //on l'ajoute à la base de donnée

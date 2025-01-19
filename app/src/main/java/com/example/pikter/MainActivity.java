@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout postLayout; //ce layout est celui qui contient les posts
 
     // Classe Post
-    public static class Post {
+    public static class Post {// on définit l'objet post avec toutes ses variables
         public String message;
         public String date;
         public String user;
@@ -60,27 +60,27 @@ public class MainActivity extends AppCompatActivity {
             this.date = date;
             this.user = user;
             this.likes = likes;
-            this.timestamp = System.currentTimeMillis(); // initialise à la date actuelle
-            this.key = null; // Initialise à null
+            this.timestamp = System.currentTimeMillis(); //prend la date
+            this.key = null; //on s'en servira plus tard pour définir un id pour les post
             this.listeUserLike = new ArrayList<>();
         }
 
         public void ajoutLike(String userId) {
-            if (!listeUserLike.contains(userId)) {
+            if (!listeUserLike.contains(userId)) { //verifie dans la liste des utilisateur qui ont like ce post
                 // Si l'utilisateur n'est pas dans la liste, on l'ajoute
                 listeUserLike.add(userId);
                 this.likes++; // On incrémente les likes
             }
         }
 
-        public long getAgeInDays() {
-            long currentTime = System.currentTimeMillis();
-            return (currentTime - timestamp) / (1000 * 60 * 60 * 24); // convertit en jours
+        public long tempsJours() {
+            long temp = System.currentTimeMillis();
+            return (temp - timestamp) / (1000 * 60 * 60 * 24); // convertit en jours
         }
 
-        public double calculateScore() {
-            long age = getAgeInDays();
-            return (30 - age) * likes; // formule pour le score
+        public double score() {
+            long duree = tempsJours(); //récupère la date
+            return (30 - duree) * likes; // formule pour le score
         }
     }
 
@@ -128,10 +128,11 @@ public class MainActivity extends AppCompatActivity {
                 //on crée un bouton qui sert de positive (on valide ce qu'on fait)
                 .setPositiveButton("Poster", new DialogInterface.OnClickListener() {
                     @Override
+                    //qua
                     public void onClick(DialogInterface dialog, int which) {
-                        addPostDatabase(message.getText().toString());
-                        dialogPost.dismiss();
-                        buildDialog();
+                        addPostDatabase(message.getText().toString()); //on ajoute les post a la bdd
+                        dialogPost.dismiss(); //on ferme la fenetre pop up
+                        buildDialog(); //on la reset
                     }
                 })
                 //on crée un bouton qui sert de negative (on annule ce qu'on fait)
@@ -168,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         myRef.child(postId).setValue(post);
     }
     //récupère les posts dans la base de données
-
+    //on change le nombre de like dans la bdd en ajoutant aussi les utilisateurs qui ont like
     private void updateLikesInDatabase(String postId, int likes, List<String> listeUserLike) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("posts").child(postId);
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 decoTextView.setText("Posts : " + numberOfPosts + "   ");
 
                 // Trier les posts par score
-                posts.sort((p1, p2) -> Double.compare(p2.calculateScore(), p1.calculateScore()));
+                posts.sort((p1, p2) -> Double.compare(p2.score(), p1.score()));
 
                 // Afficher les posts triés
                 postLayout.removeAllViews(); // Vider le layout avant d'ajouter les posts triés
@@ -218,34 +219,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-private void nbrPost(Post post) {
+    private void nbrPost(Post post) {
 
-}
+    }
 
 
     // Méthode pour afficher un post
     private void displayPost(Post post) {
-        final View view = getLayoutInflater().inflate(R.layout.post, null);
+        final View view = getLayoutInflater().inflate(R.layout.post, null); // on crée une vue à partir du layout de chaque post
 
-        String userId = LoginActivity.getUserConnecte();
+        String userId = LoginActivity.getUserConnecte(); // on récupère l'utilisateur connecté
 
-        // Mettre à jour les vues avec les données du post
+        // on met à jour la date dans la vue
         TextView dateView = view.findViewById(R.id.dateBody);
         dateView.setText(post.date);
 
+        // on met à jour le nom de l'utilisateur qui a posté
         TextView userView = view.findViewById(R.id.userBody);
         userView.setText(post.user);
 
+        // on met à jour le contenu du message
         TextView messageView = view.findViewById(R.id.messageBody);
         messageView.setText(post.message);
 
+        // on gère les likes avec un bouton toggle
         ToggleButton likeButton = view.findViewById(R.id.likeButton);
         TextView likesCountView = view.findViewById(R.id.nbrLike);
-        likesCountView.setText(post.likes + " Likes");
-        if(post.listeUserLike.contains(userId)) {
+        likesCountView.setText(post.likes + " Likes"); // on affiche le nombre de likes
+        if(post.listeUserLike.contains(userId)) { // si l'utilisateur a déjà liké, on coche le bouton
             likeButton.setChecked(true);
         }
-        else {
+        else { // sinon, on laisse le bouton non coché
             likeButton.setChecked(false);
         }
 

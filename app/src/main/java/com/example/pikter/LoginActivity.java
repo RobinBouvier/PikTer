@@ -19,34 +19,34 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    Button boutonLogin;
+    Button boutonLogin; //on déclare le boutton pour se connecter
     public static String userConnecte;
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference usersRef = database.getReference("user");
+    FirebaseDatabase database = FirebaseDatabase.getInstance(); // on déclare la bdd
+    DatabaseReference usersRef = database.getReference("user"); // on accède aux users dans notre bdd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.login);
+        EdgeToEdge.enable(this); // plein ecran
+        setContentView(R.layout.login); //on affiche notre layout login
 
-        //transformer les choses en view
-        boutonLogin = (Button) findViewById(R.id.login_button);
 
-        final EditText email = findViewById(R.id.email);
-        final EditText password = findViewById(R.id.password);
+        boutonLogin = (Button) findViewById(R.id.login_button); //on récupère le boutton du xml
+//final pour pas que la variable soit réasignée
+        final EditText email = findViewById(R.id.email);  //on récupère les champs de saisie du XML
+        final EditText password = findViewById(R.id.password); //on récupère les champs de saisie du XML
 
-        boutonLogin.setOnClickListener(new View.OnClickListener() {
+        boutonLogin.setOnClickListener(new View.OnClickListener() { //vérifie si le boutton est cliqué
             @Override
             public void onClick(View view) {
                 login(email, password);
-            }
+            }  //si le bouton est cliqué on utilise la fonction login avec le mail et le mdp
         });
     }
 
-    private void setUserConnecte(String userConnecteParam){
+    private void setUserConnecte(String userConnecteParam){ //permet de savoir quel est l'utilisateur connecté actuellement
         userConnecte = userConnecteParam;
     }
 
-    public static String getUserConnecte(){
+    public static String getUserConnecte(){//permet de récupérer le nom de l'utilisateur en string
         return userConnecte;
     }
 
@@ -92,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
-            @Override
+            @Override // gestion des erreur (sinon le programme plante)
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
