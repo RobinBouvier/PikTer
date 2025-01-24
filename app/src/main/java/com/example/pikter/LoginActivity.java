@@ -52,42 +52,42 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public void onSignUpClicked(View view) {
-        // Créer un intent pour démarrer SignupActivity
+        // créer un intent pour démarrer SignupActivity
         Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
-        startActivity(intent); // Lancer l'activité
+        startActivity(intent); // lancer l'activité
     }
 
     public void login(EditText email, EditText password) {
-        // On récupère la référence à la base de données avec l'email de l'utilisateur comme clé
-        // L'email est utilisé comme clé pour rechercher l'utilisateur dans la base de données.
+        // on récupère la référence à la base de données avec l'email de l'utilisateur comme clé
+        // l'email est utilisé comme clé pour trouer l'utilisateur dans la base de donnée
         usersRef.child(email.getText().toString()).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Vérifie si l'utilisateur existe dans la base de données
+                // vérifie si l'utilisateur existe dans la base de données
                 if (dataSnapshot.exists()) {
-                    // Récupère le mot de passe stocké dans la base de données
+                    // récupère le mot de passe la base de données
                     String storedPassword = dataSnapshot.child("password").getValue(String.class);
 
-                    // Compare le mot de passe saisi avec celui stocké dans la base de données
+                    // compare le mot de passe saisi avec de la base de données
                     if (storedPassword != null && storedPassword.equals(password.getText().toString())) {
 
-                        // Si le mot de passe est correct
+                        // si le mot de passe est correct
                         Log.d("Firebase", "L'utilisateur avec ID " + email.getText().toString() + " est connecté.");
 
-                        // Crée un Intent pour démarrer l'activité MainActivity
+                        // crée un Intent pour démarrer l'activité MainActivity
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);  // Lance l'activité Main
 
-                        // Sauvegarde l'email de l'utilisateur connecté
+                        // sauvegarde l'email de l'utilisateur connecté
                         setUserConnecte(email.getText().toString());
 
                     } else {
-                        // Si le mot de passe ne correspond pas
+                        // si le mot de passe ne correspond pas
                         Log.d("Firebase", "Mot de passe incorrect pour l'utilisateur " + email.getText().toString());
                     }
                 } else {
-                    // Si l'utilisateur n'existe pas dans la base de données
+                    // si l'utilisateur n'existe pas dans la base de données
                     Log.d("Firebase", "L'utilisateur avec ID " + email.getText().toString() + " n'existe pas.");
                 }
             }

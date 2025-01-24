@@ -11,15 +11,15 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="150dp"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/userAndDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="#FF0000">
+                android:background="#00FF0000"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/userBody"
@@ -49,8 +49,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="65dp"
                     android:layout_weight="1"
-                    android:text="message"
-                    android:background="#8097FCFF"/>
+                    android:background="#00FFF597"
+                    android:text="message" />
 
             </LinearLayout>
 
@@ -65,9 +65,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@drawable/toggle_like_selector"
+                    android:checked="false"
                     android:text=""
                     android:textOff=""
-                    android:checked="false"
                     android:textOn="" />
 
                 <TextView
@@ -78,6 +78,10 @@
                     android:text="0" />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#000000" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

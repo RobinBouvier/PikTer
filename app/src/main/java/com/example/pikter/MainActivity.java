@@ -258,23 +258,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (post.listeUserLike.contains(userId)) {
-                    // Si l'utilisateur a déjà liké, on enlève le like
+                    // si l'utilisateur a déjà liké, on enlève le like
                     post.listeUserLike.remove(userId);
-                    post.likes--; // Décrémenter les likes
+                    post.likes--; // -1 like
                     ((ToggleButton)v).setChecked(false);
 
                 } else {
-                    // Si l'utilisateur n'a pas encore liké, on ajoute le like
+                    // si l'utilisateur n'a pas encore liké, on ajoute le like
                     post.listeUserLike.add(userId);
-                    post.likes++; // Incrémenter les likes
+                    post.likes++; // +1 like
                     ((ToggleButton)v).setChecked(true);
 
                 }
                 likesCountView.setText(post.likes + " Likes");
-                updateLikesInDatabase(post.key, post.likes, post.listeUserLike); // Utiliser post.key ici
+                updateLikesInDatabase(post.key, post.likes, post.listeUserLike); //on update les likes de tous les posts
             }
         });
 
-        postLayout.addView(view); // Ajout de la vue au layout
+        postLayout.addView(view); // on ajoute  la view au layout
     }
 }

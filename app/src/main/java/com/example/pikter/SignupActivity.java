@@ -78,9 +78,9 @@ public class SignupActivity extends AppCompatActivity {
         //on l'ajoute à la base de donnée
         myRef.child(userId).setValue(user);
 
-        // Créer un intent pour démarrer MainActivity
+        // créer un intent pour démarrer MainActivity
         Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-        startActivity(intent); // Lancer l'activité
+        startActivity(intent); // lancer l'activité
 
     }
 }
